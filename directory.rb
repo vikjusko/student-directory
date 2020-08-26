@@ -1,3 +1,5 @@
+require 'csv'
+
 @students = []
 def print_menu
   puts "1. Input the students"
@@ -17,14 +19,19 @@ end
 def process(selection)
   case selection
   when "1"
+    puts "You have chosen to indput a student name"
     input_students
   when "2"
+    puts "You have chosen to show a list of students"
     show_students
   when "3"
+    puts "You have chosen to save a student to a document"
    save_students
   when "4"
+    puts "You have chosen to load the student file"
    load_students
   when "9"
+    puts "You have chosen to exit"
     exit
   else
     puts "I don't know what you mean, try again please"
@@ -61,26 +68,21 @@ def print_student_list
 end
 
 def print_footer
-  puts "Overall, we have #{@students.count} great students"
+  puts "Now, we have #{@students.count} great student" if @students.count == 1
+    puts "Now we have #{@students.count} great students" if @students.count > 1
 end
 
-def save_students
-  file = File.open("students.csv", "w")
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+def save_students(filename = "students.csv")
+  CSV.open(filename, "w") do |file|
+    @students.each do |student|
+      file << [student[:name], student[:cohort]]
   end
-  file.close
+end
 end
 
 def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym}
-  end
-  file.close
+  @students = CSV.read(filename)
+  p @students
 end
 
 def try_load_students
